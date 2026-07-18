@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bundle Frame Generator – EFG Digital</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+:root{--bg:#F5F6FA;--s1:#FFFFFF;--s2:#F0F1F7;--bd:#E0E2F0;--ac:#FF8C00;--ac2:#FF63A5;--tx:#1A1A2E;--mt:#6868A0;--dm:#A0A0C0;--green:#16a34a;--red:#ef4444;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column;}
+.hdr{background:var(--s1);border-bottom:1px solid var(--bd);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.brand{display:flex;align-items:center;gap:10px;}
+.logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#FF8C00,#FF63A5);display:flex;align-items:center;justify-content:center;font-size:20px;}
+.brand-name{font-size:14px;font-weight:700;}
+.brand-sub{font-size:10px;color:var(--mt);}
+.badge{background:rgba(255,140,0,.12);border:1px solid rgba(255,140,0,.3);border-radius:99px;padding:2px 10px;font-size:10px;font-weight:600;color:var(--ac);margin-left:6px;}
+.apibar{display:flex;align-items:center;gap:7px;background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:6px 10px;}
+.apibar input{background:none;border:none;color:var(--tx);font-family:monospace;font-size:11px;width:180px;outline:none;}
+.apibar input::placeholder{color:var(--dm);}
+.api-dot{width:8px;height:8px;border-radius:50%;background:var(--dm);flex-shrink:0;}
+.api-dot.ok{background:var(--green);}.api-dot.err{background:var(--red);}
+.btn-tiny{padding:4px 10px;border-radius:6px;border:1px solid var(--bd);background:var(--s1);color:var(--mt);font-family:inherit;font-size:11px;cursor:pointer;}
+.hdr-link{color:var(--ac);font-size:11px;text-decoration:none;}
+.layout{display:flex;flex:1;overflow:hidden;}
+.panel-l{width:290px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--bd);overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:13px;}
+.panel-r{flex:1;overflow-y:auto;padding:20px;}
+.sec-lbl{font-size:10px;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;color:var(--mt);margin-bottom:7px;}
+.fi{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-family:inherit;font-size:13px;padding:8px 10px;outline:none;}
+.fi:focus{border-color:var(--ac);}
+select.fi{cursor:pointer;}
+textarea.fi{resize:vertical;font-size:12px;line-height:1.8;}
+.tags{display:flex;flex-wrap:wrap;gap:6px;}
+.tag{padding:4px 10px;border-radius:99px;font-size:11px;font-weight:500;border:1px solid var(--bd);background:var(--s2);color:var(--mt);cursor:pointer;user-select:none;}
+.tag.on{background:rgba(255,140,0,.15);border-color:var(--ac);color:var(--ac);}
+.chip{padding:3px 9px;border-radius:99px;font-size:10px;background:var(--s2);border:1px solid var(--bd);color:var(--mt);}
+.info-box{border-radius:9px;padding:10px 12px;font-size:11px;line-height:1.7;background:rgba(255,140,0,.07);border:1px solid rgba(255,140,0,.25);color:#92400e;}
+.btn-gen{width:100%;padding:13px;border-radius:11px;border:none;background:linear-gradient(135deg,#FF8C00,#FF63A5);color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(255,140,0,.3);}
+.btn-gen:disabled{opacity:.45;cursor:not-allowed;}
+.res-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+.res-title{font-size:12px;font-weight:600;color:var(--mt);}
+.res-acts{display:flex;gap:7px;}
+.btn-sm{padding:5px 11px;border-radius:7px;border:1px solid var(--bd);background:var(--s1);color:var(--mt);font-family:inherit;font-size:11px;cursor:pointer;}
+.btn-sm:hover{border-color:var(--ac);color:var(--ac);}
+.result-wrap{background:var(--s1);border:1px solid var(--bd);border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06);}
+.bundle-prev{min-height:300px;display:flex;align-items:center;justify-content:center;padding:20px;background:repeating-conic-gradient(#DDD 0% 25%,#FFF 0% 50%) 0 0/20px 20px;position:relative;}
+.bundle-prev svg{max-width:100%;max-height:400px;}
+.bundle-foot{padding:14px 16px;border-top:1px solid var(--bd);}
+.bundle-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.btn-primary{padding:10px 18px;border-radius:9px;border:none;background:linear-gradient(135deg,#FF8C00,#FF63A5);color:#fff;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;}
+.btn-sec{padding:10px 14px;border-radius:9px;border:1px solid var(--bd);background:var(--s2);color:var(--tx);font-family:inherit;font-size:12px;cursor:pointer;}
+.iblock{background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:10px;margin-top:10px;}
+.iblock-lbl{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--mt);margin-bottom:5px;}
+.iblock-val{font-size:12px;color:var(--tx);line-height:1.6;}
+.kw-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px;}
+.kw-tag{padding:2px 7px;border-radius:99px;font-size:10px;background:rgba(255,140,0,.1);border:1px solid rgba(255,140,0,.3);color:var(--ac);}
+.code-box{background:#1C1C28;border-radius:8px;padding:10px;font-family:monospace;font-size:10px;color:#63FFD4;overflow-x:auto;max-height:100px;overflow-y:auto;white-space:pre;margin-top:10px;}
+.skel{background:var(--s1);border:1px solid var(--bd);border-radius:14px;overflow:hidden;}
+.skel-prev{height:300px;background:#ECEDF5;display:flex;align-items:center;justify-content:center;font-size:36px;}
+.prog-wrap{margin-bottom:12px;display:none;}
+.prog-bar{height:5px;border-radius:3px;background:var(--bd);overflow:hidden;}
+.prog-fill{height:100%;width:0%;background:linear-gradient(90deg,#FF8C00,#FF63A5);border-radius:3px;transition:width .3s;}
+.prog-lbl{font-size:10px;color:var(--mt);margin-top:4px;}
+.fail-card{background:var(--s1);border:1px dashed rgba(239,68,68,.3);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;gap:10px;text-align:center;min-height:200px;}
+.fail-msg{font-size:12px;color:var(--red);max-width:300px;line-height:1.7;}
+.empty{text-align:center;padding:80px 20px;}
+.empty-ico{font-size:52px;opacity:.3;margin-bottom:12px;}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:.9}}.pulse{animation:pulse 1.4s ease-in-out infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+.toast{position:fixed;bottom:20px;right:20px;z-index:999;background:var(--s1);border:1px solid var(--ac);border-radius:9px;padding:10px 16px;font-size:13px;color:var(--tx);transform:translateY(70px);opacity:0;transition:all .3s;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+@media(max-width:640px){.layout{flex-direction:column;}.panel-l{width:100%;max-height:60vh;border-right:none;border-bottom:1px solid var(--bd);}}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:#C0C0D8;border-radius:99px;}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="brand">
+    <div class="logo">📦</div>
+    <div>
+      <div class="brand-name">Bundle Frame Generator <span class="badge">1 REQUEST · ADOBE STOCK</span></div>
+      <div class="brand-sub">EFG Digital · Google Gemini AI</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+    <div class="apibar">
+      <div class="api-dot" id="apiDot"></div>
+      <input type="password" id="apiKey" placeholder="Gemini API Key...">
+      <button class="btn-tiny" id="toggleBtn">👁</button>
+      <select id="modelSel" style="background:transparent;border:none;color:var(--mt);font-family:monospace;font-size:11px;outline:none;cursor:pointer;padding:2px;">
+        <option value="gemini-2.5-flash" selected>2.5-flash ⭐</option>
+        <option value="gemini-2.5-flash-lite">2.5-flash-lite</option>
+      </select>
+    </div>
+    <a class="hdr-link" href="https://aistudio.google.com/app/apikey" target="_blank">✦ Key Gratis</a>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="panel-l">
+    <div class="info-box">📦 <strong>Bundle = 1 Request AI</strong><br>Semua icon dibuat dalam 1 SVG frame sekaligus. Hemat quota, lebih cepat.</div>
+    <div>
+      <div class="sec-lbl">Tema Bundle</div>
+      <select class="fi" id="theme">
+        <option value="badminton">🏸 Badminton Equipment</option>
+        <option value="volleyball">🏐 Volleyball Set</option>
+        <option value="soccer">⚽ Soccer Football</option>
+        <option value="fitness">💪 Fitness Gym</option>
+        <option value="ai_tech">🤖 AI Technology</option>
+        <option value="business">💼 Business Finance</option>
+        <option value="ecommerce">🛒 E-Commerce</option>
+        <option value="medical">🏥 Medical Health</option>
+        <option value="food">🍕 Food Beverage</option>
+        <option value="travel">✈️ Travel Tourism</option>
+        <option value="nature">🌿 Nature</option>
+        <option value="social_media">📱 Social Media</option>
+        <option value="custom">✏️ Custom...</option>
+      </select>
+    </div>
+    <div id="customWrap" style="display:none;">
+      <label style="font-size:11px;color:var(--mt);margin-bottom:4px;display:block;">Item (1 per baris, max sesuai grid):</label>
+      <textarea class="fi" id="customItems" style="min-height:110px;" placeholder="badminton racket&#10;shuttlecock&#10;sport bag&#10;sport shoes"></textarea>
+      <div id="itemCount" style="font-size:10px;color:var(--mt);margin-top:4px;"></div>
+    </div>
+    <div>
+      <div class="sec-lbl">Preview Item</div>
+      <div id="previewList" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
+    </div>
+    <div>
+      <div class="sec-lbl">Grid Layout</div>
+      <select class="fi" id="gridLayout">
+        <option value="2x2">2×2 grid — 4 icon (Recommended)</option>
+        <option value="3x3">3×3 grid — 9 icon</option>
+        <option value="2x3">2×3 grid — 6 icon</option>
+        <option value="4x2">4×2 grid — 8 icon</option>
+      </select>
+    </div>
+    <div>
+      <div class="sec-lbl">Gaya Visual</div>
+      <select class="fi" id="style">
+        <option value="flat colorful minimal">Flat Colorful</option>
+        <option value="flat minimal clean">Flat Minimal</option>
+        <option value="outline bold stroke">Outline Bold</option>
+        <option value="isometric 3D flat">Isometric 3D</option>
+        <option value="gradient modern">Gradient Modern</option>
+      </select>
+    </div>
+    <div>
+      <div class="sec-lbl">Warna Bundle</div>
+      <div class="tags" id="colorTags">
+        <span class="tag on" data-v="#2563EB,#7C3AED,#0891B2,#16A34A">🔵 Blue</span>
+        <span class="tag" data-v="#EA580C,#CA8A04,#F59E0B,#DC2626">🟠 Warm</span>
+        <span class="tag" data-v="#16A34A,#059669,#0891B2,#2563EB">🟢 Cool</span>
+        <span class="tag" data-v="#7C3AED,#6366F1,#EC4899,#0891B2">🟣 Purple</span>
+        <span class="tag" data-v="#111827,#374151,#6B7280,#9CA3AF">⚫ Mono</span>
+        <span class="tag" data-v="#2563EB,#DC2626,#16A34A,#CA8A04,#7C3AED,#0891B2">🌈 Multi</span>
+      </div>
+    </div>
+    <div>
+      <div class="sec-lbl">Ukuran Frame</div>
+      <select class="fi" id="frameSize">
+        <option value="800">800px</option>
+        <option value="1200" selected>1200px</option>
+        <option value="1600">1600px</option>
+      </select>
+    </div>
+    <button class="btn-gen" id="genBtn">
+      <span id="genIco">📦</span><span id="genTxt">Generate Bundle Frame</span>
+    </button>
+  </div>
+
+  <div class="panel-r">
+    <div class="res-hdr">
+      <div class="res-title" id="statusMsg">Pilih tema dan klik Generate</div>
+      <div class="res-acts">
+        <button class="btn-sm" id="btnDl">⬇ Download SVG</button>
+        <button class="btn-sm" id="btnPng">🖼 PNG</button>
+        <button class="btn-sm" id="btnClear">🗑 Hapus</button>
+      </div>
+    </div>
+    <div class="prog-wrap" id="progWrap">
+      <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+      <div class="prog-lbl" id="progLbl"></div>
+    </div>
+    <div id="resultArea">
+      <div class="empty">
+        <div class="empty-ico">📦</div>
+        <div style="font-size:14px;font-weight:600;color:var(--mt);margin-bottom:6px;">Belum ada bundle</div>
+        <div style="font-size:12px;color:var(--dm);">Pilih tema di kiri lalu klik Generate</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var apiKey='', colors='#2563EB,#7C3AED,#0891B2,#16A34A', result=null;
+
+var THEMES={
+  badminton:['badminton racket','shuttlecock','sport bag','grip tape','sport shoes','wristband','trophy cup','scoreboard','court net','headband'],
+  volleyball:['volleyball ball','volleyball net','knee pad','sport shoes','jersey uniform','wristband','water bottle','whistle','trophy medal','sand court'],
+  soccer:['soccer ball','football cleats','goalkeeper gloves','shin guard','jersey','corner flag','goal post','referee whistle','yellow card','trophy cup'],
+  fitness:['dumbbell','barbell','yoga mat','resistance band','jump rope','protein shaker','gym gloves','kettlebell','foam roller','sport shoes'],
+  ai_tech:['robot head','brain circuit','processor chip','cloud server','data chart','eye scan','voice wave','security shield','gear cogwheel','infinity loop'],
+  business:['bar chart','pie chart','gold coins','briefcase','handshake','invoice','calculator','piggy bank','target arrow','trophy award'],
+  ecommerce:['shopping cart','price tag','credit card','delivery box','barcode','storefront','wishlist heart','coupon','digital wallet','star rating'],
+  medical:['stethoscope','medical cross','pill capsule','syringe','heartbeat monitor','health shield','microscope','bandage','thermometer','medical bag'],
+  food:['pizza slice','burger','coffee cup','sushi roll','salad bowl','birthday cake','fruit bowl','chef hat','fork and knife','wine glass'],
+  travel:['airplane','suitcase','passport','camera','map pin','hotel','beach umbrella','compass','train','travel ticket'],
+  nature:['oak tree','green leaf','bright sun','water drop','mountain','flower','cloud','butterfly','recycle','earth globe'],
+  social_media:['thumbs up','chat bubble','share arrow','notification bell','camera','video play','user avatar','hashtag','trending chart','heart reaction']
+};
+
+window.addEventListener('load', function(){
+  document.getElementById('apiKey').addEventListener('input', function(){
+    apiKey=this.value.trim();
+    document.getElementById('apiDot').className='api-dot '+(apiKey.length>20?'ok':apiKey.length>0?'err':'');
+  });
+  document.getElementById('toggleBtn').addEventListener('click', function(){
+    var i=document.getElementById('apiKey'); i.type=i.type==='password'?'text':'password';
+  });
+  document.getElementById('theme').addEventListener('change', function(){
+    document.getElementById('customWrap').style.display=this.value==='custom'?'block':'none';
+    updatePreview();
+  });
+  document.getElementById('customItems').addEventListener('input', updatePreview);
+  document.getElementById('gridLayout').addEventListener('change', updatePreview);
+  document.querySelectorAll('#colorTags .tag').forEach(function(t){
+    t.addEventListener('click', function(){
+      document.querySelectorAll('#colorTags .tag').forEach(function(x){x.classList.remove('on');});
+      t.classList.add('on'); colors=t.getAttribute('data-v');
+    });
+  });
+  document.getElementById('genBtn').addEventListener('click', generate);
+  document.getElementById('btnDl').addEventListener('click', function(){if(result)dlMeta(result);});
+  document.getElementById('btnPng').addEventListener('click', function(){if(result)dlPNG(result,1200);});
+  document.getElementById('btnClear').addEventListener('click', clearAll);
+  updatePreview();
+});
+
+function getItems(){
+  var theme=document.getElementById('theme').value;
+  var gl=document.getElementById('gridLayout').value;
+  var gp=gl.split('x'); var max=parseInt(gp[0])*parseInt(gp[1]);
+  if(theme==='custom'){
+    return document.getElementById('customItems').value.split('\n').map(function(s){return s.trim();}).filter(Boolean).slice(0,max);
+  }
+  return(THEMES[theme]||[]).slice(0,max);
+}
+
+function updatePreview(){
+  var items=getItems();
+  document.getElementById('previewList').innerHTML=items.map(function(it){return '<span class="chip">'+it+'</span>';}).join('');
+  var cEl=document.getElementById('itemCount');
+  if(cEl){
+    var gl=document.getElementById('gridLayout').value;
+    var gp=gl.split('x'); var max=parseInt(gp[0])*parseInt(gp[1]);
+    cEl.textContent=items.length+' item (max '+max+')';
+  }
+}
+
+async function callGemini(prompt, maxTokens){
+  var model=document.getElementById('modelSel').value||'gemini-2.5-flash';
+  var url='https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent?key='+apiKey;
+  for(var attempt=0;attempt<3;attempt++){
+    try{
+      var res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.7,maxOutputTokens:maxTokens||8192}})});
+      if(res.status===429){
+        var ed=await res.json().catch(function(){return{};});
+        var m=(ed&&ed.error&&ed.error.message)||'';
+        var rm=m.match(/retry in ([0-9.]+)s/);
+        var wait=rm?Math.ceil(parseFloat(rm[1]))+2:20;
+        if(attempt<2){setStatus('Rate limit — tunggu '+wait+'d...');await sleep(wait*1000);continue;}
+        throw new Error('Rate limit! Tunggu 1 menit lalu coba lagi.');
+      }
+      if(!res.ok){var e=await res.json().catch(function(){return{};});throw new Error((e&&e.error&&e.error.message)||'HTTP '+res.status);}
+      var d=await res.json();
+      return(d&&d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts&&d.candidates[0].content.parts[0]&&d.candidates[0].content.parts[0].text)||'';
+    }catch(fe){if(attempt<2&&fe.message&&fe.message.indexOf('Rate limit')===-1){await sleep(3000);continue;}throw fe;}
+  }
+  throw new Error('Gagal setelah 3 percobaan');
+}
+
+function cleanSVG(raw, W, H){
+  raw=raw.replace(/```[\w]*/g,'').replace(/```/g,'').trim();
+  var si=raw.indexOf('<svg'); if(si===-1)throw new Error('SVG tidak ditemukan');
+  var svg=raw.slice(si);
+  var ct='<'+'/svg>'; var ei=svg.lastIndexOf(ct);
+  if(ei!==-1)svg=svg.slice(0,ei+6); else svg=svg.trimEnd()+'\n'+ct;
+  svg=svg.replace(/<!--[\s\S]*?-->/g,'');
+  if(svg.indexOf('xmlns=')===-1)svg=svg.replace('<svg','<svg xmlns="http://www.w3.org/2000/svg"');
+  if(svg.indexOf('viewBox')===-1)svg=svg.replace('<svg','<svg viewBox="0 0 '+W+' '+H+'"');
+  try{
+    var doc=new DOMParser().parseFromString(svg,'image/svg+xml');
+    if(!doc.querySelector('parsererror'))return new XMLSerializer().serializeToString(doc.documentElement);
+    svg=svg.replace(/&(?![a-zA-Z#][a-zA-Z0-9]*;)/g,'&amp;');
+    var d2=new DOMParser().parseFromString(svg,'image/svg+xml');
+    if(!d2.querySelector('parsererror'))return new XMLSerializer().serializeToString(d2.documentElement);
+  }catch(e){}
+  return svg;
+}
+
+async function generate(){
+  if(!apiKey||apiKey.length<20){toast('Masukkan Gemini API Key!');return;}
+  var items=getItems();
+  if(!items.length){toast('Pilih tema atau isi item custom!');return;}
+  var style=document.getElementById('style').value;
+  var fSize=parseInt(document.getElementById('frameSize').value)||1200;
+  var gl=document.getElementById('gridLayout').value;
+  var gp=gl.split('x');
+  var cols=parseInt(gp[0]), rows=parseInt(gp[1]);
+  var cell=Math.floor(fSize/cols);
+  var fH=rows*cell;
+
+  setLoad(true); result=null;
+  document.getElementById('resultArea').innerHTML='<div class="skel"><div class="skel-prev pulse" style="min-height:300px;font-size:36px;">📦</div><div style="padding:14px 16px;border-top:1px solid var(--bd);"><div class="skel-bar pulse" style="width:60%;"></div></div></div>';
+  setProg(10,'Menghubungi AI...');
+  setStatus('Generating bundle '+cols+'×'+rows+' — '+items.length+' icon dalam 1 request...');
+
+  try{
+    var ca=colors.split(',').map(function(c){return c.trim();});
+    var positions=items.map(function(it,i){
+      var c=i%cols, r=Math.floor(i/cols);
+      return 'Icon '+(i+1)+' "'+it+'": x='+(c*cell)+' y='+(r*cell)+' w='+cell+' h='+cell+' centerX='+(c*cell+Math.round(cell/2));
+    }).join('\n');
+
+    var prompt='Create ONE SVG image containing '+items.length+' flat vector icons arranged in a '+cols+' column by '+rows+' row grid.\n\n'
+      +'ICONS LIST (draw each one):\n'+items.map(function(it,i){return (i+1)+'. '+it;}).join('\n')+'\n\n'
+      +'EXACT CELL COORDINATES FOR EACH ICON:\n'+positions+'\n\n'
+      +'SVG CANVAS: viewBox="0 0 '+fSize+' '+fH+'" width="'+fSize+'" height="'+fH+'"\n\n'
+      +'WHAT TO DRAW FIRST (in order):\n'
+      +'1. White background: <rect width="'+fSize+'" height="'+fH+'" fill="#FFFFFF"/>\n'
+      +'2. For each icon cell, draw white box: <rect x="X" y="Y" width="'+cell+'" height="'+cell+'" fill="#FFFFFF" stroke="#E0E2F0" stroke-width="1"/>\n'
+      +'3. Draw each icon INSIDE its cell. Icon fills 60% of cell, centered in cell.\n\n'
+      +'STYLE: '+style+'\n'
+      +'PRIMARY COLORS: '+ca.slice(0,4).join(', ')+'\n\n'
+      +'CRITICAL RULES:\n'
+      +'- MUST draw ALL '+items.length+' icons. Do not skip any.\n'
+      +'- Each icon must be clearly recognizable\n'
+      +'- All icon shapes must be WITHIN their cell boundaries\n'
+      +'- Use rect, circle, ellipse, path, polygon. You may use <g> to group.\n'
+      +'- NO text labels inside SVG. NO HTML comments.\n'
+      +'- Path d attribute: ONLY M L C Q A Z + numbers\n'
+      +'- Use the provided colors. Make icons colorful and clear.\n\n'
+      +'Start: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+fSize+' '+fH+'" width="'+fSize+'" height="'+fH+'">\n'
+      +'End: </svg>\nOutput ONLY the SVG. No markdown. No explanation.';
+
+    setProg(30,'AI generating all '+items.length+' icons...');
+    var raw=await callGemini(prompt, 8192);
+    setProg(70,'Processing SVG...');
+    var svg=cleanSVG(raw, fSize, fH);
+    setProg(85,'Generating metadata...');
+    var meta=await genMeta(items, style, document.getElementById('theme').options[document.getElementById('theme').selectedIndex].text);
+    setProg(100,'Done!');
+
+    result={desc:'Bundle: '+items.join(', '),svg:svg,meta:meta,w:fSize,h:fH,items:items};
+
+    document.getElementById('resultArea').innerHTML=
+      '<div class="result-wrap">'
+      +'<div class="bundle-prev">'+svg+'</div>'
+      +'<div class="bundle-foot">'
+      +'<div style="font-size:13px;font-weight:600;">'+( meta.title||'Bundle Frame')+'</div>'
+      +'<div style="font-size:10px;color:var(--mt);margin-top:3px;">'+fSize+'×'+fH+'px · '+items.length+' icons · SVG</div>'
+      +'<div class="bundle-acts">'
+      +'<button class="btn-primary" onclick="dlMeta(result)">⬇ SVG + Metadata</button>'
+      +'<button class="btn-sec" onclick="dlPNG(result,1200)">🖼 PNG 1200px</button>'
+      +'</div>'
+      +'<div class="iblock"><div class="iblock-lbl">Judul Adobe Stock</div><div class="iblock-val">'+( meta.title||'-')+'</div></div>'
+      +'<div class="iblock"><div class="iblock-lbl">Keywords ('+( meta.keywords||[]).length+')</div>'
+      +'<div class="kw-wrap">'+( meta.keywords||[]).map(function(k){return '<span class="kw-tag">'+k+'</span>';}).join('')+'</div></div>'
+      +'<div class="code-box">'+svg.slice(0,800)+'...'+'</div>'
+      +'</div></div>';
+
+    setStatus('Bundle berhasil! '+items.length+' icon dalam 1 frame');
+  }catch(e){
+    var isQ=e.message&&(e.message.indexOf('Rate limit')!==-1||e.message.indexOf('quota')!==-1);
+    document.getElementById('resultArea').innerHTML='<div class="fail-card"><div style="font-size:36px;">'+(isQ?'⏳':'⚠️')+'</div><div class="fail-msg">'+e.message+'</div></div>';
+    setStatus('Gagal: '+e.message);
+  }
+  setLoad(false);
+}
+
+async function genMeta(items, style, cat){
+  var desc=items.slice(0,4).join(', ');
+  var prompt='Adobe Stock metadata for vector icon bundle: "'+desc+' and more". Style: '+style+'. Category: '+cat+'.\n'
+    +'Return ONLY JSON: {"title":"...","description":"...","keywords":["kw1","kw2",...]}\n'
+    +'title max 70 chars, description max 200 chars, keywords: 40 English microstock words. No markdown.';
+  try{
+    var raw=await callGemini(prompt, 512);
+    raw=raw.replace(/```[\w]*/g,'').replace(/```/g,'').trim();
+    var js=raw.indexOf('{'), je=raw.lastIndexOf('}');
+    if(js!==-1&&je!==-1){
+      var m=JSON.parse(raw.slice(js,je+1));
+      var kws=Array.isArray(m.keywords)?m.keywords:String(m.keywords||'').split(',').map(function(k){return k.trim();}).filter(Boolean);
+      return{title:m.title||desc,description:m.description||'',keywords:kws.slice(0,50)};
+    }
+  }catch(e){}
+  return{title:'Vector Icon Bundle Set',description:'Professional flat vector icon bundle for Adobe Stock.',keywords:['bundle','icon','set','vector','flat','design']};
+}
+
+function sfn(item){return(item.desc||'bundle').replace(/\s+/g,'-').toLowerCase().slice(0,40);}
+function dlBlob(data,fn,type){var b=new Blob([data],{type:type});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);}
+
+function buildMeta(item){
+  var m=item.meta||{};
+  var ti=m.title||item.desc, de=m.description||'', kws=m.keywords||[];
+  var now=new Date().toISOString();
+  function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  var c='/';
+  var xmp=['<?xpacket begin="" id="W5M0MpCehiHzreSzNTczkc9d"?>',
+    '<x:xmpmeta xmlns:x="adobe:ns:meta/">',
+    '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">',
+    '<rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xmp="http://ns.adobe.com/xap/1.0/">',
+    '<dc:title><rdf:Alt><rdf:li xml:lang="x-default">'+esc(ti)+'<'+c+'rdf:li><'+c+'rdf:Alt><'+c+'dc:title>',
+    '<dc:description><rdf:Alt><rdf:li xml:lang="x-default">'+esc(de)+'<'+c+'rdf:li><'+c+'rdf:Alt><'+c+'dc:description>',
+    '<dc:subject><rdf:Bag>'+kws.map(function(k){return '<rdf:li>'+esc(k)+'<'+c+'rdf:li>';}).join('')+'<'+c+'rdf:Bag><'+c+'dc:subject>',
+    '<xmp:CreateDate>'+now+'<'+c+'xmp:CreateDate>',
+    '<xmp:CreatorTool>EFG Digital Bundle Frame Generator<'+c+'xmp:CreatorTool>',
+    '<'+c+'rdf:Description>','<'+c+'rdf:RDF>','<'+c+'x:xmpmeta>','<?xpacket end="w"?>'].join('\n');
+  var mb='<metadata>'+xmp+'<'+c+'metadata>\n<title>'+esc(ti)+'<'+c+'title>\n<desc>'+esc(de)+'<'+c+'desc>';
+  var svg=item.svg, te=svg.indexOf('>');
+  return te===-1?svg:svg.slice(0,te+1)+'\n'+mb+'\n'+svg.slice(te+1);
+}
+
+function dlMeta(item){dlBlob(buildMeta(item),sfn(item)+'-stock.svg','image/svg+xml');toast('SVG + Metadata downloaded!');}
+
+function dlPNG(item,size){
+  var c2=document.createElement('canvas'); c2.width=size; c2.height=Math.round(size*(item.h/item.w));
+  var ctx=c2.getContext('2d');
+  ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,c2.width,c2.height);
+  var blob=new Blob([item.svg],{type:'image/svg+xml;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var img=new Image();
+  img.onload=function(){
+    ctx.drawImage(img,0,0,c2.width,c2.height);
+    setTimeout(function(){
+      var a=document.createElement('a'); a.download=sfn(item)+'-'+size+'px.png';
+      a.href=c2.toDataURL('image/png');
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url); toast('PNG downloaded!');
+    },150);
+  };
+  img.onerror=function(){URL.revokeObjectURL(url);toast('PNG gagal — download SVG saja');};
+  img.src=url;
+}
+
+function clearAll(){
+  result=null;
+  document.getElementById('resultArea').innerHTML='<div class="empty"><div class="empty-ico">📦</div><div style="font-size:14px;font-weight:600;color:var(--mt);margin-bottom:6px;">Belum ada bundle</div><div style="font-size:12px;color:var(--dm);">Pilih tema di kiri lalu klik Generate</div></div>';
+  setStatus('Pilih tema dan klik Generate');
+  hideProg();
+}
+
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+function setStatus(msg){document.getElementById('statusMsg').textContent=msg;}
+function setLoad(on){
+  var btn=document.getElementById('genBtn'); btn.disabled=on;
+  document.getElementById('genIco').innerHTML=on?'<div class="spinner"></div>':'📦';
+  document.getElementById('genTxt').textContent=on?'Generating...':'Generate Bundle Frame';
+}
+function setProg(pct,lbl){document.getElementById('progWrap').style.display='block';document.getElementById('progFill').style.width=pct+'%';if(lbl)document.getElementById('progLbl').textContent=lbl;}
+function hideProg(){document.getElementById('progWrap').style.display='none';}
+function toast(msg){var el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(function(){el.classList.remove('show');},2800);}
+</script>
+</body>
+</html>
